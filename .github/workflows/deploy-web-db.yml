@@ -30,6 +30,7 @@ jobs:
           MASTERPASS: ${{ secrets.MASTERPASS }}
           DRIZZLE_PORT: ${{ secrets.DRIZZLE_PORT }}
           DB_PATH: ${{ vars.DB_PATH }}
+          NETWORK_NAME: ${{ vars.NETWORK_NAME }}
         run: |
           # Теперь все docker команды выполняются на удаленном сервере
           docker compose --profile web-db up -d --pull always --remove-orphans --force-recreate --wait --wait-timeout 30
