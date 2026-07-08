@@ -31,6 +31,7 @@ jobs:
         run: |
           docker volume rm cogni-proxy_traefik-dynamic >/dev/null 2>&1 || true
           docker network inspect ${{ vars.NETWORK_NAME }} >/dev/null 2>&1 || docker network create ${{ vars.NETWORK_NAME }}
+          docker compose --profile traefik config
           docker compose --profile traefik up -d --pull always --remove-orphans --force-recreate --wait --wait-timeout 30
           docker cp traefik/dynamic/. traefik:/etc/traefik/dynamic/
           docker image prune -f
