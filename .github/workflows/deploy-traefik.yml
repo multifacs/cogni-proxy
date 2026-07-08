@@ -28,12 +28,9 @@ jobs:
         env:
           DOCKER_HOST: ssh://${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}
           NETWORK_NAME: ${{ vars.NETWORK_NAME }}
-          MASTERPASS: ${{ secrets.MASTERPASS }}
-          DRIZZLE_PORT: ${{ secrets.DRIZZLE_PORT }}
-          DB_PATH: ${{ vars.DB_PATH }}
         run: |
           docker volume rm cogni-proxy_traefik-dynamic >/dev/null 2>&1 || true
           docker network inspect ${{ vars.NETWORK_NAME }} >/dev/null 2>&1 || docker network create ${{ vars.NETWORK_NAME }}
-          docker compose --profile traefik --profile dev-redirect up -d --pull always --remove-orphans --force-recreate --wait --wait-timeout 30
+          docker compose --profile traefik up -d --pull always --remove-orphans --force-recreate --wait --wait-timeout 30
           docker cp traefik/dynamic/. traefik:/etc/traefik/dynamic/
           docker image prune -f
