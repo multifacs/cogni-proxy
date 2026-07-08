@@ -1,0 +1,26 @@
+name: Wipe ACME Volume
+
+on: workflow_dispatch
+
+jobs:
+  wipe:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up SSH agent
+        uses: webfactory/ssh-agent@v0.10.0
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Add to Known Hosts
+        run: |
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Wipe acme volume
+        env:
+          DOCKER_HOST: ssh://${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}
+        run: |
+          docker compose --profile traefik down
+          docker volume rm cogni-proxy_acme || true
+          docker compose --profile traefik --profile dev-redirect up -d --pull always --remove-orphans --force-recreate --wait --wait-timeout 30
+          docker cp traefik/dynamic/. traefik:/etc/traefik/dynamic/

@@ -8,10 +8,24 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    command:
+      - "--api.dashboard=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.web.http.redirections.entrypoint.permanent=true"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.email=kiwi0tails@gmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/acme/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=cogni-network"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - /root/cogni-test/acme:/acme
-      - /root/cogni-test/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - acme:/acme
       - traefik-dynamic:/etc/traefik/dynamic
     networks:
       - cogni-network
@@ -39,4 +53,5 @@ networks:
 
 volumes:
   drizzle-gateway:
+  acme:
   traefik-dynamic:
