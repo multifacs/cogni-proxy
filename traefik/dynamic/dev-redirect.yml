@@ -1,0 +1,17 @@
+http:
+  routers:
+    dev-cogni-redirect:
+      rule: "Host(`dev.cogni-test.ru`)"
+      entryPoints:
+        - web
+        - websecure
+      middlewares:
+        - redirect-dev-to-main
+      service: noop@internal
+
+  middlewares:
+    redirect-dev-to-main:
+      redirectRegex:
+        regex: "^https?://dev\\.cogni-test\\.ru/(.*)"
+        replacement: "https://cogni-test.ru/${1}"
+        permanent: true

@@ -1,0 +1,42 @@
+services:
+  traefik:
+    image: traefik:v3
+    profiles:
+      - "traefik"
+    container_name: traefik
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /root/cogni-test/acme:/acme
+      - /root/cogni-test/traefik/traefik.yml:/etc/traefik/traefik.yml:ro
+      - traefik-dynamic:/etc/traefik/dynamic
+    networks:
+      - cogni-network
+
+  drizzle-gateway:
+    image: ghcr.io/drizzle-team/gateway:latest
+    profiles:
+      - "web-db"
+    container_name: drizzle-gate
+    restart: always
+    ports:
+      - "${DRIZZLE_PORT}:4983"
+    environment:
+      - PORT=4983
+      - STORE_PATH=/database
+      - MASTERPASS=${MASTERPASS}
+    volumes:
+      - drizzle-gateway:/app
+      - ${DB_PATH}:/database
+
+networks:
+  cogni-network:
+    name: ${NETWORK_NAME}
+    external: true
+
+volumes:
+  drizzle-gateway:
+  traefik-dynamic:
